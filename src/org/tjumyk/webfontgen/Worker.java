@@ -31,7 +31,7 @@ public class Worker {
 			String[] files, String[] excludeDirs, String encode, File cssFile,
 			boolean needHints, boolean needMicrotypeExpress,
 			boolean enableCSSMatch) throws IOException, SAXException {
-		URL cdURL = cd.toURI().toURL();
+		//URL cdURL = cd.toURI().toURL();
 		String[] fontNames = new String[srcFontFiles.length];
 		for (int i = 0; i < srcFontFiles.length; i++) {
 			fontNames[i] = FilenameUtils.getBaseName(srcFontFiles[i].getName());
@@ -56,8 +56,8 @@ public class Worker {
 				URL fileUrl = file.toURI().toURL();
 				String ext = FilenameUtils.getExtension(file.getName());
 				if (CSSFontMatcher.isExtSupported(ext)) {
-					matcher.analyzeFonts(cdURL, fileUrl, encode, charsUsedMap,
-							fontNames);
+					matcher.analyzeFonts(fileUrl, fileUrl, encode,
+							charsUsedMap, fontNames);
 				} else {
 					System.out
 							.println("[Warning] Unsupported file extension for \"-d\" mode: \""
