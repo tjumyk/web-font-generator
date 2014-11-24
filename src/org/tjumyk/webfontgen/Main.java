@@ -96,7 +96,7 @@ public class Main {
 				&& srcFontFile.length > 0 && distFontDir != null) {
 			worker.work(srcDir, srcFontFile, distFontDir, files, excludeDirs,
 					encode, cssFile, needHints, needMicrotypeExpress,
-					needDeepMatch);
+					needDeepMatch, true);
 			System.out.println("All done.");
 		} else {
 			printHelp();
@@ -125,68 +125,65 @@ public class Main {
 	private static Options buildOptions() {
 		Options options = new Options();
 
-		//@formatter:off
-		options.addOption(Option.builder("?")
-				                .desc("Show this help info.")
-				                .longOpt("help")
-				                .build());
-		options.addOption(Option.builder("v")
-                				.desc("Show version info.")
-                				.longOpt("version")
-                				.build());
-		options.addOption(Option.builder("s")
-				                .argName("DIR")
-							    .hasArg()
-							    .desc("Root dir of your website dir or workspace dir. Defaults to \""+DEFAULT_SRC_DIR+"\".")
-							    .longOpt("src")
-							    .build());
-		options.addOption(Option.builder("o")
-							 	.argName("DIR")
-								.hasArg()
-								.desc("Dir to store the generated fonts. Defaults to \""+DEFAULT_OUTPUT_DIR+"\".")
-								.longOpt("out")
-								.build());
-		options.addOption(Option.builder("i")
-								.argName("FILE1,FILE2,...")
-								.hasArgs()
-								.valueSeparator(',')
-								.desc("Specify files to include for scanning (wildcard available). Defaults to \""+DEFAULT_INCLUDE_FILES+"\".")
-								.longOpt("include")
-								.build());
-		options.addOption(Option.builder("x")
-							    .argName("DIR1,DIR2,...")
-							    .hasArgs()
-							    .valueSeparator(',')
-							    .desc("Specify which dirs will be skipped (wildcard available).")
-							    .longOpt("exclude")
-							    .build());
-		options.addOption(Option.builder("e")
-								.argName("CHARSET")
-								.hasArg()
-								.desc("Specify the encoding charset for parsing files. Defaults to \"UTF-8\".")
-								.longOpt("encode")
-								.build());
-		options.addOption(Option.builder("c")
-				 				.argName("FILE")
-				 				.hasArg()
-				 				.desc("Specify the filename(and location) of the generated CSS file. Defaults to \""+DEFAULT_OUTPUT_DIR
-				 						+ File.separator + DEFAULT_CSS_NAME+"\".")
-				 				.longOpt("css")
-				 				.build());
+		// @formatter:off
+		options.addOption(Option.builder("?").desc("Show this help info.")
+				.longOpt("help").build());
+		options.addOption(Option.builder("v").desc("Show version info.")
+				.longOpt("version").build());
+		options.addOption(Option
+				.builder("s")
+				.argName("DIR")
+				.hasArg()
+				.desc("Root dir of your website dir or workspace dir. Defaults to \""
+						+ DEFAULT_SRC_DIR + "\".").longOpt("src").build());
+		options.addOption(Option
+				.builder("o")
+				.argName("DIR")
+				.hasArg()
+				.desc("Dir to store the generated fonts. Defaults to \""
+						+ DEFAULT_OUTPUT_DIR + "\".").longOpt("out").build());
+		options.addOption(Option
+				.builder("i")
+				.argName("FILE1,FILE2,...")
+				.hasArgs()
+				.valueSeparator(',')
+				.desc("Specify files to include for scanning (wildcard available). Defaults to \""
+						+ DEFAULT_INCLUDE_FILES + "\".").longOpt("include")
+				.build());
+		options.addOption(Option
+				.builder("x")
+				.argName("DIR1,DIR2,...")
+				.hasArgs()
+				.valueSeparator(',')
+				.desc("Specify which dirs will be skipped (wildcard available).")
+				.longOpt("exclude").build());
+		options.addOption(Option
+				.builder("e")
+				.argName("CHARSET")
+				.hasArg()
+				.desc("Specify the encoding charset for parsing files. Defaults to \"UTF-8\".")
+				.longOpt("encode").build());
+		options.addOption(Option
+				.builder("c")
+				.argName("FILE")
+				.hasArg()
+				.desc("Specify the filename(and location) of the generated CSS file. Defaults to \""
+						+ DEFAULT_OUTPUT_DIR
+						+ File.separator
+						+ DEFAULT_CSS_NAME + "\".").longOpt("css").build());
 		options.addOption(Option.builder("h")
-								.desc("Keep hint info of the generated WOFF/EOT/TTF font.")
-								.longOpt("hint")
-								.build());
-		options.addOption(Option.builder("m")
-								.desc("Enable Microtype Express Compression for the generated EOT font.")
-								.longOpt("mec")
-								.build());
-		options.addOption(Option.builder("d")
-								.desc("(Experimental)Enable deep scanning to get precise font-text match so as to make fonts much smaller.\n"
-									 +"[Notice] If enabled, ensure all related css files could be accessible(e.g. css from servers linked by absolute path), and you'd better add \"@charset\" declaration in your css.")
-								.longOpt("deep")
-								.build());
-		//@formatter:on
+				.desc("Keep hint info of the generated WOFF/EOT/TTF font.")
+				.longOpt("hint").build());
+		options.addOption(Option
+				.builder("m")
+				.desc("Enable Microtype Express Compression for the generated EOT font.")
+				.longOpt("mec").build());
+		options.addOption(Option
+				.builder("d")
+				.desc("(Experimental)Enable deep scanning to get precise font-text match so as to make fonts much smaller.\n"
+						+ "[Notice] If enabled, ensure all related css files could be accessible(e.g. css from servers linked by absolute path), and you'd better add \"@charset\" declaration in your css.")
+				.longOpt("deep").build());
+		// @formatter:on
 		return options;
 	}
 }

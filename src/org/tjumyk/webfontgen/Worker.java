@@ -17,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.http.client.fluent.Request;
 import org.xml.sax.SAXException;
 
 import com.google.typography.font.tools.sfnttool.SfntTool;
@@ -30,8 +31,9 @@ public class Worker {
 	public void work(File cd, File[] srcFontFiles, File distFontDir,
 			String[] files, String[] excludeDirs, String encode, File cssFile,
 			boolean needHints, boolean needMicrotypeExpress,
-			boolean enableCSSMatch) throws IOException, SAXException {
-		//URL cdURL = cd.toURI().toURL();
+			boolean enableCSSMatch, boolean isLocal) throws IOException,
+			SAXException {
+		// URL cdURL = cd.toURI().toURL();
 		String[] fontNames = new String[srcFontFiles.length];
 		for (int i = 0; i < srcFontFiles.length; i++) {
 			fontNames[i] = FilenameUtils.getBaseName(srcFontFiles[i].getName());
@@ -40,28 +42,55 @@ public class Worker {
 
 		charUsed.clear();
 		charsUsedMap.clear();
-		for (File file : FileUtils.listFiles(cd, new WildcardFileFilter(files,
-				IOCase.INSENSITIVE), FileFilterUtils
-				.notFileFilter(new WildcardFileFilter(excludeDirs,
-						IOCase.INSENSITIVE)))) {
-			System.out.println("Scanning File: " + file);
-			if (!enableCSSMatch) {
-				String str = FileUtils.readFileToString(file, encode);
-				for (int i = 0, j = str.length(); i < j; i++) {
-					charUsed.add(str.charAt(i));
-				}
-			} else {
-				if (matcher == null)
-					matcher = new CSSFontMatcher();
-				URL fileUrl = file.toURI().toURL();
-				String ext = FilenameUtils.getExtension(file.getName());
-				if (CSSFontMatcher.isExtSupported(ext)) {
-					matcher.analyzeFonts(fileUrl, fileUrl, encode,
-							charsUsedMap, fontNames);
+
+		if (isLocal) {
+			for (File file : FileUtils.listFiles(cd, new WildcardFileFilter(
+					files, IOCase.INSENSITIVE), FileFilterUtils
+					.notFileFilter(new WildcardFileFilter(excludeDirs,
+							IOCase.INSENSITIVE)))) {
+				System.out.println("Scanning File: " + file);
+				if (!enableCSSMatch) {
+					String str = FileUtils.readFileToString(file, encode);
+					for (int i = 0, j = str.length(); i < j; i++) {
+						charUsed.add(str.charAt(i));
+					}
 				} else {
-					System.out
-							.println("[Warning] Unsupported file extension for \"-d\" mode: \""
-									+ file + "\", scan skipped.");
+					if (matcher == null)
+						matcher = new CSSFontMatcher();
+					URL fileUrl = file.toURI().toURL();
+					String ext = FilenameUtils.getExtension(file.getName());
+					if (CSSFontMatcher.isExtSupported(ext)) {
+						matcher.analyzeFonts(fileUrl, fileUrl, encode,
+								charsUsedMap, fontNames);
+					} else {
+						System.out
+								.println("[Warning] Unsupported file extension for \"-d\" mode: \""
+										+ file + "\", scan skipped.");
+					}
+				}
+			}
+		} else {
+			for (String fileUrl : files) {
+				URL url = new URL(fileUrl);
+				System.out.println("Scanning Url: " + url);
+				if (!enableCSSMatch) {
+					String str = Request.Get(url.toExternalForm()).execute()
+							.returnContent().asString();
+					for (int i = 0, j = str.length(); i < j; i++) {
+						charUsed.add(str.charAt(i));
+					}
+				} else {
+					if (matcher == null)
+						matcher = new CSSFontMatcher();
+					String ext = FilenameUtils.getExtension(fileUrl);
+					if (CSSFontMatcher.isExtSupported(ext)) {
+						matcher.analyzeFonts(url, url, encode, charsUsedMap,
+								fontNames);
+					} else {
+						System.out
+								.println("[Warning] Unsupported file extension for \"-d\" mode: \""
+										+ fileUrl + "\", scan skipped.");
+					}
 				}
 			}
 		}
@@ -164,7 +193,7 @@ public class Worker {
 		System.out.printf("%1$,.1fKB\n", FileUtils.sizeOf(cssFile) / 1024.0);
 	}
 
-	private String getURLFriendlyFontName(String name) {
+	protected String getURLFriendlyFontName(String name) {
 		for (int i = 0; i < name.length(); i++) {
 			char ch = name.charAt(i);
 			if (ch >= 128) { // non-ascii
@@ -178,7 +207,7 @@ public class Worker {
 		return name;
 	}
 
-	private void createFont(String srcFontPath, String fontName,
+	protected void createFont(String srcFontPath, String fontName,
 			String distPath, String text, boolean needHints,
 			boolean needMicrotypeExpress) throws IOException {
 		//@formatter:off
