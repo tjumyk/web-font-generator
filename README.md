@@ -53,6 +53,10 @@ Test
 ---------------
 Browse into `test` folder, there is a `RunTest.bat` file for Windows. Double-click it to run, then the fonts and css will be generated and you may open the `test.html` file in your favourite browser (but Chrome is recommended) to see the texts decorated with different fonts. 
 
+The rendered page will look like this
+
+![pic1](screenshots/2.png)
+
 Yeah, they are all Chinese... I hope you like it.
 
 Dependencies
